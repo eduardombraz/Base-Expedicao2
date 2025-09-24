@@ -103,8 +103,6 @@ async def main():
             # Atualizar Google Sheets
             if new_file_path:
                 update_packing_google_sheets(new_file_path)
-            if new_file_path2:
-                update_packing_google_sheets2(new_file_path2)
 
             print("Dados atualizados com sucesso.")
 
