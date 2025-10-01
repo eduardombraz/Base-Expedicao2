@@ -82,13 +82,13 @@ async def main():
             await page.goto("https://spx.shopee.com.br/#/hubLinehaulTrips/trip")
             await page.wait_for_timeout(8000)
             await page.locator(
-                'xpath=/html[1]/body[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/span[1]'
+                'xpath=/html[1]/body[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/span[1]'
             ).click()
             await page.wait_for_timeout(8000)
             await page.get_by_role("button", name="Exportar").nth(0).click()
-            await page.wait_for_timeout(400000)
+            await page.wait_for_timeout(10000)
 
-            # 👉 Botão de download 1
+            # 👉 Botão de download 2
             await page.goto("https://spx.shopee.com.br/#/taskCenter/exportTaskCenter")
             await page.wait_for_timeout(8000)
             async with page.expect_download() as download_info:
@@ -96,7 +96,7 @@ async def main():
             download = await download_info.value
             download_path = os.path.join(DOWNLOAD_DIR, download.suggested_filename)
             await download.save_as(download_path)
-            new_file_path = rename_downloaded_file(DOWNLOAD_DIR, download_path)
+            new_file_path = rename_downloaded_file(DOWNLOAD_DIR, download_path)  
 
             #####################################################################
 
