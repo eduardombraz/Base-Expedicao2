@@ -142,7 +142,7 @@ async def main():
                 return  
   
             # Localiza o botão "Exportar"  
-            export_button = page.get_by_role("button", name="Exportar").nth(0)  
+            export_button = page.get_by_role('button', name='Exportar').nth(0)  
             await export_button.wait_for(timeout=10000)  
   
             # Verifica se o botão está habilitado  
@@ -159,8 +159,7 @@ async def main():
             try:  
                 logger.info("📥 Esperando download iniciar (200s)...")  
                 async with page.expect_download(timeout=200000):  
-                    await export_button.click()  # Clica novamente para garantir  
-                download = await page.wait_for_download(timeout=200000)  
+
             except Exception as e:  
                 logger.error(f"❌ Falha ao esperar download: {e}")  
                 logger.warning("🚫 Nenhum download foi iniciado. Verifique se o botão 'Exportar' está ativo ou se há dados para exportar.")  
