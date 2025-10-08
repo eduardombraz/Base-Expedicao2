@@ -126,7 +126,20 @@ async def main():
             # NAVEGAÇÃO E DOWNLOAD 1: Exportar Trip  
             logger.info("📋 Navegando para exportação de Trip...")  
             await page.goto("https://spx.shopee.com.br/#/hubLinehaulTrips/trip")  
-            await page.wait_for_timeout(5000)  
+  
+            # Espera a página carregar completamente  
+            logger.info("⏳ Esperando página carregar (até 30s)...")  
+            try:  
+                await page.wait_for_selector('xpath=//*[@id="app"]', timeout=30000)  
+            except Exception as e:  
+                logger.error(f"❌ Falha ao carregar página: {e}")  
+                # Tenta screenshot para debug  
+                try:  
+                    await page.screenshot(path="debug_screenshot.png")  
+                    logger.info("📸 Screenshot salvo como 'debug_screenshot.png'")  
+                except:  
+                    logger.warning("⚠️ Não foi possível salvar screenshot.")  
+                return  
   
             # Localiza o botão "Exportar"  
             export_button = page.get_by_role("button", name="Exportar").nth(0)  
@@ -166,7 +179,19 @@ async def main():
             # DOWNLOAD 2: Task Center  
             logger.info("📥 Baixando arquivo do Task Center...")  
             await page.goto("https://spx.shopee.com.br/#/taskCenter/exportTaskCenter")  
-            await page.wait_for_timeout(5000)  
+  
+            # Espera a página carregar  
+            logger.info("⏳ Esperando página do Task Center carregar (até 30s)...")  
+            try:  
+                await page.wait_for_selector('xpath=//*[@id="app"]', timeout=30000)  
+            except Exception as e:  
+                logger.error(f"❌ Falha ao carregar página do Task Center: {e}")  
+                try:  
+                    await page.screenshot(path="debug_task_center.png")  
+                    logger.info("📸 Screenshot salvo como 'debug_task_center.png'")  
+                except:  
+                    logger.warning("⚠️ Não foi possível salvar screenshot.")  
+                return  
   
             task_button = page.get_by_role("button", name="Baixar").nth(0)  
             await task_button.wait_for(timeout=10000)  
