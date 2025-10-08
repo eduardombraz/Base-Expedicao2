@@ -123,24 +123,46 @@ async def main():
                 logger.info("⚠️ Nenhum pop-up encontrado. Pressionando Escape.")  
                 await page.keyboard.press("Escape")  
   
-            # DOWNLOAD 1: Exportar Trip  
+            # NAVEGAÇÃO E DOWNLOAD 1: Exportar Trip  
             logger.info("📋 Navegando para exportação de Trip...")  
             await page.goto("https://spx.shopee.com.br/#/hubLinehaulTrips/trip")  
             await page.wait_for_timeout(5000)  
   
-            await page.locator(  
-                'xpath=/html[1]/body[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/span[1]'  
-            ).click()  
-            await page.wait_for_timeout(5000)  
+            # Localiza o botão "Exportar"  
+            export_button = page.get_by_role("button", name="Exportar").nth(0)  
+            await export_button.wait_for(timeout=10000)  
   
-            logger.info("📤 Iniciando download de 'Exportar'...")  
-            async with page.expect_download(timeout=120000):  
-                await page.get_by_role("button", name="Exportar").nth(0).click()  
+            # Verifica se o botão está habilitado  
+            if await export_button.is_disabled():  
+                logger.error("❌ Botão 'Exportar' está desativado. Verifique os filtros ou dados.")  
+                return  
   
-            download = await page.wait_for_download(timeout=120000)  
+            # Clica no botão  
+            logger.info("📤 Clicando no botão 'Exportar'...")  
+            await export_button.click()  
+            await page.wait_for_timeout(5000)  # Espera 5s para o download iniciar  
+  
+            # Tenta capturar o download com timeout  
+            try:  
+                logger.info("📥 Esperando download iniciar (120s)...")  
+                async with page.expect_download(timeout=120000):  
+                    await export_button.click()  # Clica novamente para garantir  
+                download = await page.wait_for_download(timeout=120000)  
+            except Exception as e:  
+                logger.error(f"❌ Falha ao esperar download: {e}")  
+                logger.info("⚠️ Tentando verificar se há downloads pendentes...")  
+                pending_downloads = context.downloads()  
+                if pending_downloads:  
+                    logger.info(f"📦 {len(pending_downloads)} download(s) pendente(s) encontrado(s).")  
+                else:  
+                    logger.warning("🚫 Nenhum download foi iniciado. Verifique o SPX.")  
+                return  
+  
+            # Salva o arquivo  
             download_path = download_dir / download.suggested_filename  
             await download.save_as(download_path)  
   
+            # Renomeia  
             new_file_path = rename_downloaded_file(download_dir, download_path)  
             if not new_file_path:  
                 logger.error("❌ Falha ao renomear o arquivo. Encerrando.")  
@@ -151,16 +173,27 @@ async def main():
             await page.goto("https://spx.shopee.com.br/#/taskCenter/exportTaskCenter")  
             await page.wait_for_timeout(5000)  
   
-            async with page.expect_download(timeout=120000):  
-                await page.get_by_role("button", name="Baixar").nth(0).click()  
+            task_button = page.get_by_role("button", name="Baixar").nth(0)  
+            await task_button.wait_for(timeout=10000)  
   
-            download2 = await page.wait_for_download(timeout=120000)  
-            download_path2 = download_dir / download2.suggested_filename  
-            await download2.save_as(download_path2)  
+            if await task_button.is_disabled():  
+                logger.warning("⚠️ Botão 'Baixar' está desativado no Task Center.")  
+            else:  
+                await task_button.click()  
+                await page.wait_for_timeout(5000)  
   
-            new_file_path2 = rename_downloaded_file(download_dir, download_path2)  
-            if not new_file_path2:  
-                logger.warning("⚠️ Falha ao renomear o segundo arquivo. Continuando...")  
+                try:  
+                    async with page.expect_download(timeout=120000):  
+                        await task_button.click()  
+                    download2 = await page.wait_for_download(timeout=120000)  
+                    download_path2 = download_dir / download2.suggested_filename  
+                    await download2.save_as(download_path2)  
+  
+                    new_file_path2 = rename_downloaded_file(download_dir, download_path2)  
+                    if not new_file_path2:  
+                        logger.warning("⚠️ Falha ao renomear o segundo arquivo. Continuando...")  
+                except Exception as e:  
+                    logger.error(f"❌ Falha no download do Task Center: {e}")  
   
             # Atualiza Google Sheets  
             logger.info("🔄 Atualizando Google Sheets...")  
@@ -182,4 +215,4 @@ async def main():
   
   
 if __name__ == "__main__":  
-    asyncio.run(main())  
+    asyncio.run(main()
