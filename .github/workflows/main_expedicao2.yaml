@@ -37,4 +37,4 @@ jobs:
         env:  
           SHOPEE_USER: ${{ secrets.SHOPEE_USER }}  
           SHOPEE_PASS: ${{ secrets.SHOPEE_PASS }}  
-        shell: bash  
+        shell: bash 
