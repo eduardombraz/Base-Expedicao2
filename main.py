@@ -133,7 +133,6 @@ async def main():
                 await page.wait_for_selector('xpath=//*[@id="app"]', timeout=30000)  
             except Exception as e:  
                 logger.error(f"❌ Falha ao carregar página: {e}")  
-                # Tenta screenshot para debug  
                 try:  
                     await page.screenshot(path="debug_screenshot.png")  
                     logger.info("📸 Screenshot salvo como 'debug_screenshot.png'")  
@@ -142,7 +141,7 @@ async def main():
                 return  
   
             # Localiza o botão "Exportar"  
-            export_button = page.get_by_role('button', name='Exportar').nth(0)  
+            export_button = page.get_by_role("button", name="Exportar").nth(0)  
             await export_button.wait_for(timeout=10000)  
   
             # Verifica se o botão está habilitado  
@@ -159,7 +158,8 @@ async def main():
             try:  
                 logger.info("📥 Esperando download iniciar (200s)...")  
                 async with page.expect_download(timeout=200000):  
-
+                    await page.wait_for_download(timeout=200000)  
+                download = await page.wait_for_download(timeout=200000)  
             except Exception as e:  
                 logger.error(f"❌ Falha ao esperar download: {e}")  
                 logger.warning("🚫 Nenhum download foi iniciado. Verifique se o botão 'Exportar' está ativo ou se há dados para exportar.")  
@@ -203,7 +203,7 @@ async def main():
   
                 try:  
                     async with page.expect_download(timeout=120000):  
-                        await task_button.click()  
+                        await page.wait_for_download(timeout=120000)  
                     download2 = await page.wait_for_download(timeout=120000)  
                     download_path2 = download_dir / download2.suggested_filename  
                     await download2.save_as(download_path2)  
@@ -234,4 +234,4 @@ async def main():
   
   
 if __name__ == "__main__":  
-    asyncio.run(main())  
+    asyncio.run(main())
