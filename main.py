@@ -157,10 +157,10 @@ async def main():
   
             # Tenta capturar o download com timeout  
             try:  
-                logger.info("📥 Esperando download iniciar (120s)...")  
-                async with page.expect_download(timeout=120000):  
+                logger.info("📥 Esperando download iniciar (200s)...")  
+                async with page.expect_download(timeout=200000):  
                     await export_button.click()  # Clica novamente para garantir  
-                download = await page.wait_for_download(timeout=120000)  
+                download = await page.wait_for_download(timeout=200000)  
             except Exception as e:  
                 logger.error(f"❌ Falha ao esperar download: {e}")  
                 logger.warning("🚫 Nenhum download foi iniciado. Verifique se o botão 'Exportar' está ativo ou se há dados para exportar.")  
