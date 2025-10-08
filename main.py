@@ -9,9 +9,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 DOWNLOAD_DIR = "/tmp"
 
-==============================
-#Renomear arquivo baixado (nome único)
-==============================
 def rename_downloaded_file(download_dir, download_path):
 try:
 stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -26,9 +23,6 @@ except Exception as e:
 print(f"Erro ao renomear o arquivo: {e}")
 return None
 
-==============================
-#Leitura robusta do CSV
-==============================
 def read_csv_robusto(csv_file_path):
 # Detecta encoding com chardet e tenta fallbacks e separadores comuns
 try:
@@ -61,9 +55,7 @@ try:
     return df  
 except Exception as e:  
     raise RuntimeError(f"Falha ao ler CSV com encodings {encodings} e seps {seps}: {e or last_err}")  
-==============================
-#Atualizar Google Sheets
-==============================
+
 def update_packing_google_sheets(csv_file_path):
 try:
 if not os.path.exists(csv_file_path):
@@ -87,9 +79,7 @@ return
     print("Arquivo enviado com sucesso para a aba 'Base Ended'.")  
 except Exception as e:  
     print(f"Erro durante o processo: {e}")  
-==============================
-#Fluxo principal Playwright
-==============================
+
 async def main():
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 async with async_playwright() as p:
