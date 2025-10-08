@@ -150,12 +150,7 @@ async def main():
                 download = await page.wait_for_download(timeout=120000)  
             except Exception as e:  
                 logger.error(f"❌ Falha ao esperar download: {e}")  
-                logger.info("⚠️ Tentando verificar se há downloads pendentes...")  
-                pending_downloads = context.downloads()  
-                if pending_downloads:  
-                    logger.info(f"📦 {len(pending_downloads)} download(s) pendente(s) encontrado(s).")  
-                else:  
-                    logger.warning("🚫 Nenhum download foi iniciado. Verifique o SPX.")  
+                logger.warning("🚫 Nenhum download foi iniciado. Verifique se o botão 'Exportar' está ativo ou se há dados para exportar.")  
                 return  
   
             # Salva o arquivo  
